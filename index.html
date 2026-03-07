@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trading Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --panel: #131720;
+    --panel2: #181e2a;
+    --border: #1e2736;
+    --border2: #252e40;
+    --accent-green: #00e676;
+    --accent-red: #ff3d57;
+    --accent-yellow: #ffc107;
+    --accent-cyan: #00bcd4;
+    --accent-blue: #448aff;
+    --text: #c8d6f0;
+    --text-dim: #4a5a78;
+    --text-muted: #2a3550;
+    --input-bg: #0d1220;
+    --dot-green: #00e676;
+    --dot-orange: #ff9800;
+    --mono: 'Share Tech Mono', monospace;
+    --sans: 'Rajdhani', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    font-family: var(--sans);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 24px 16px 40px;
+    background-image:
+      radial-gradient(ellipse 60% 40% at 50% 0%, rgba(68,138,255,0.04) 0%, transparent 70%),
+      repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(30,39,54,0.3) 40px),
+      repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(30,39,54,0.15) 40px);
+  }
+
+  .app {
+    width: 100%;
+    max-width: 560px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* ===== PANEL ===== */
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(68,138,255,0.3), transparent);
+  }
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(0,0,0,0.2);
+  }
+
+  .panel-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 6px currentColor;
+  }
+
+  .panel-dot.green { background: var(--dot-green); color: var(--dot-green); }
+  .panel-dot.orange { background: var(--dot-orange); color: var(--dot-orange); }
+
+  .panel-title {
+    font-family: var(--sans);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .panel-body {
+    padding: 8px 0;
+  }
+
+  /* ===== ROW ===== */
+  .row {
+    display: grid;
+    grid-template-columns: 24px 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 16px;
+    position: relative;
+  }
+
+  .row + .row { border-top: 1px solid rgba(30,39,54,0.5); }
+
+  .row-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+    padding-top: 2px;
+  }
+
+  .row-label-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .row-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.02em;
+  }
+
+  .row-label.sl { color: var(--accent-red); }
+
+  .row-sub {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  .row-sub span {
+    color: var(--accent-cyan);
+  }
+
+  .row-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* ===== INPUTS ===== */
+  input[type="number"], input[type="text"] {
+    background: var(--input-bg);
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    padding: 7px 10px;
+    text-align: right;
+    width: 120px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    -moz-appearance: textfield;
+  }
+
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  input:focus {
+    border-color: rgba(68,138,255,0.5);
+    box-shadow: 0 0 0 2px rgba(68,138,255,0.08), inset 0 0 12px rgba(68,138,255,0.04);
+  }
+
+  input.yellow { border-color: rgba(255,193,7,0.4); }
+  input.yellow:focus { border-color: rgba(255,193,7,0.7); box-shadow: 0 0 0 2px rgba(255,193,7,0.07); }
+
+  input.cyan { border-color: rgba(0,188,212,0.35); }
+  input.cyan:focus { border-color: rgba(0,188,212,0.6); box-shadow: 0 0 0 2px rgba(0,188,212,0.07); }
+
+  input.red { border-color: rgba(255,61,87,0.4); }
+  input.red:focus { border-color: rgba(255,61,87,0.6); box-shadow: 0 0 0 2px rgba(255,61,87,0.07); }
+
+  /* readonly / computed fields */
+  input[readonly] {
+    background: rgba(0,0,0,0.3);
+    cursor: default;
+    color: var(--accent-cyan);
+    border-color: rgba(0,188,212,0.2);
+  }
+
+  .unit {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    min-width: 18px;
+    text-align: left;
+  }
+
+  .unit.pct { color: var(--accent-green); }
+
+  /* ===== DIRECTION BUTTONS ===== */
+  .dir-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 10px 16px 8px;
+  }
+
+  .btn-dir {
+    border: none;
+    border-radius: 4px;
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    padding: 11px 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-long {
+    background: rgba(0,230,118,0.08);
+    border: 1px solid var(--accent-green);
+    color: var(--accent-green);
+    box-shadow: inset 0 0 20px rgba(0,230,118,0.05);
+  }
+
+  .btn-long.active {
+    background: rgba(0,230,118,0.15);
+    box-shadow: 0 0 16px rgba(0,230,118,0.2), inset 0 0 20px rgba(0,230,118,0.1);
+  }
+
+  .btn-short {
+    background: rgba(255,61,87,0.06);
+    border: 1px solid rgba(255,61,87,0.35);
+    color: rgba(255,100,120,0.7);
+  }
+
+  .btn-short.active {
+    border-color: var(--accent-red);
+    color: var(--accent-red);
+    background: rgba(255,61,87,0.12);
+    box-shadow: 0 0 16px rgba(255,61,87,0.2), inset 0 0 20px rgba(255,61,87,0.08);
+  }
+
+  .btn-dir:hover { filter: brightness(1.15); transform: translateY(-1px); }
+  .btn-dir:active { transform: translateY(0); }
+
+  .arrow { font-size: 10px; }
+
+  /* ===== LEVERAGE PANEL ===== */
+  .leverage-panel {
+    border-top: 1px solid var(--border);
+    background: rgba(0,0,0,0.2);
+    padding: 10px 16px 12px;
+  }
+
+  .leverage-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .leverage-sub {
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+  }
+
+  .leverage-display {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .leverage-value {
+    font-family: var(--mono);
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--accent-blue);
+    text-shadow: 0 0 12px rgba(68,138,255,0.4);
+    min-width: 50px;
+  }
+
+  .leverage-unit {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+  }
+
+  /* ===== DIVIDER ===== */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border2), transparent);
+    margin: 0 16px;
+  }
+
+  /* ===== SL badge ===== */
+  .sl-badge {
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--accent-red);
+    background: rgba(255,61,87,0.12);
+    border: 1px solid rgba(255,61,87,0.3);
+    border-radius: 3px;
+    padding: 1px 5px;
+    margin-right: 4px;
+  }
+
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- PANEL 1: Strategy Data -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-dot green"></div>
+      <span class="panel-title">Данные согласно стратегии</span>
+    </div>
+    <div class="panel-body">
+
+      <!-- 1. Capital -->
+      <div class="row">
+        <div class="row-num">1</div>
+        <div class="row-label-wrap">
+          <span class="row-label">Капитал</span>
+        </div>
+        <div class="row-right">
+          <input type="number" id="capital" class="yellow" value="500" step="1" min="0" />
+          <span class="unit">$</span>
+        </div>
+      </div>
+
+      <!-- 2. SL -->
+      <div class="row">
+        <div class="row-num">2</div>
+        <div class="row-label-wrap">
+          <span class="row-label">СЛ / убыток</span>
+          <span class="row-sub" id="sl-sub">2% = <span id="sl-usd">5.00</span> $</span>
+        </div>
+        <div class="row-right">
+          <input type="number" id="sl-pct" class="yellow" value="1" step="0.1" min="0" max="100" />
+          <span class="unit pct">%</span>
+        </div>
+      </div>
+
+      <!-- 3. TP -->
+      <div class="row">
+        <div class="row-num">3</div>
+        <div class="row-label-wrap">
+          <span class="row-label">ТП / прибыль 1к2</span>
+          <span class="row-sub" id="tp-sub">3% = <span id="tp-usd">15.00</span> $</span>
+        </div>
+        <div class="row-right">
+          <input type="number" id="tp-mult" class="yellow" value="3" step="0.1" min="0" />
+          <span class="unit">крат</span>
+        </div>
+      </div>
+
+      <!-- 4. Liquidation -->
+      <div class="row">
+        <div class="row-num">4</div>
+        <div class="row-label-wrap">
+          <span class="row-label">Ликвидация = СЛ×</span>
+          <span class="row-sub" id="liq-sub">5% = <span id="liq-usd">10000.00</span> $</span>
+        </div>
+        <div class="row-right">
+          <input type="number" id="liq-mult" class="yellow" value="5" step="0.1" min="0" />
+          <span class="unit">крат</span>
+        </div>
+      </div>
+
+      <!-- 5. Maker commission -->
+      <div class="row">
+        <div class="row-num">5</div>
+        <div class="row-label-wrap">
+          <span class="row-label">Комиссия Мейкер</span>
+        </div>
+        <div class="row-right">
+          <input type="number" id="commission" class="yellow" value="0.02" step="0.001" min="0" max="100" />
+          <span class="unit pct">%</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PANEL 2: Order Data -->
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-dot orange"></div>
+      <span class="panel-title">Данные на открытие ордера</span>
+    </div>
+
+    <!-- Auto direction indicator -->
+    <div style="padding: 10px 16px 8px;">
+      <div id="dir-btn" class="btn-dir btn-long active" style="width:100%;">
+        <span id="dir-arrow" class="arrow">▲</span>
+        <span id="dir-label">ЛОНГ</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="panel-body">
+
+      <!-- 1. Entry price -->
+      <div class="row">
+        <div class="row-num">1</div>
+        <div class="row-label-wrap">
+          <span class="row-label">ТВХ (цена входа)</span>
+        </div>
+        <div class="row-right">
+          <input type="number" id="entry" class="yellow" value="72470.70" step="0.01" min="0" />
+          <span class="unit">$</span>
+        </div>
+      </div>
+
+      <!-- 2. SL exit - MANUAL input -->
+      <div class="row">
+        <div class="row-num">2</div>
+        <div class="row-label-wrap">
+          <span class="row-label sl">Выход по СЛ</span>
+        </div>
+        <div class="row-right">
+          <input type="number" id="sl-price" class="yellow" value="70658.90" step="0.01" min="0" />
+          <span class="unit">$</span>
+        </div>
+      </div>
+
+      <!-- 3. Token volume -->
+      <div class="row">
+        <div class="row-num">3</div>
+        <div class="row-label-wrap">
+          <span class="row-label">Объём токена</span>
+        </div>
+        <div class="row-right">
+          <input type="number" id="token-vol" class="cyan" readonly />
+          <span class="unit">шт</span>
+        </div>
+      </div>
+
+      <!-- 4. TP exit -->
+      <div class="row">
+        <div class="row-num">4</div>
+        <div class="row-label-wrap">
+          <span class="row-label">Выход по ТП</span>
+        </div>
+        <div class="row-right">
+          <input type="number" id="tp-price" class="cyan" readonly />
+          <span class="unit">$</span>
+        </div>
+      </div>
+
+      <!-- 5. Liquidation price -->
+      <div class="row">
+        <div class="row-num">5</div>
+        <div class="row-label-wrap">
+          <span class="row-label">Цена ликвидации</span>
+        </div>
+        <div class="row-right">
+          <input type="number" id="liq-price" class="cyan" readonly />
+          <span class="unit">$</span>
+        </div>
+      </div>
+
+      <!-- 6. Leverage -->
+      <div class="row">
+        <div class="row-num">6</div>
+        <div class="row-label-wrap">
+          <span class="row-label">Кредитное плечо</span>
+          <span class="row-sub">макс. расчётное</span>
+        </div>
+        <div class="row-right">
+          <input type="text" id="leverage-val" class="cyan" readonly value="0" />
+          <span class="unit">крат</span>
+        </div>
+      </div>
+
+      <!-- 7. Commission paid -->
+      <div class="row">
+        <div class="row-num">7</div>
+        <div class="row-label-wrap">
+          <span class="row-label">Комиссия к оплате</span>
+          <span class="row-sub">при открытии ордера</span>
+        </div>
+        <div class="row-right">
+          <input type="text" id="commission-val" class="cyan" readonly value="0.00" />
+          <span class="unit">$</span>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  function val(id) {
+    return parseFloat(document.getElementById(id).value) || 0;
+  }
+
+  function set(id, v, decimals = 2) {
+    const el = document.getElementById(id);
+    if (el) el.value = isFinite(v) ? v.toFixed(decimals) : '—';
+  }
+
+  function calculate() {
+    const capital  = val('capital');
+    const slPct    = val('sl-pct');
+    const tpMult   = val('tp-mult');
+    const liqMult  = val('liq-mult');
+    const commPct  = val('commission');
+    const entry    = val('entry');
+    const slPrice  = val('sl-price');
+
+    // Авто-определение направления: ТВХ - СЛ > 0 → ЛОНГ, < 0 → ШОРТ
+    const diff = entry - slPrice;
+    const direction = diff >= 0 ? 'long' : 'short';
+
+    const btn   = document.getElementById('dir-btn');
+    const arrow = document.getElementById('dir-arrow');
+    const label = document.getElementById('dir-label');
+
+    if (direction === 'long') {
+      btn.className = 'btn-dir btn-long active';
+      arrow.textContent = '▲';
+      label.textContent = 'ЛОНГ';
+    } else {
+      btn.className = 'btn-dir btn-short active';
+      arrow.textContent = '▼';
+      label.textContent = 'ШОРТ';
+    }
+
+    // ── Strategy panel ─────────────────────────────────────────────
+    const slUsd  = capital * slPct / 100;
+    const tpPct  = slPct * tpMult;
+    const tpUsd  = capital * tpPct / 100;
+    const liqPct = slPct * liqMult;
+    const liqUsd = capital * liqPct / 100;
+
+    document.getElementById('sl-sub').innerHTML =
+      `${slPct.toFixed(1)}% = <span>${slUsd.toFixed(2)}</span> $`;
+    document.getElementById('tp-sub').innerHTML =
+      `${tpPct.toFixed(1)}% = <span>${tpUsd.toFixed(2)}</span> $`;
+    document.getElementById('liq-sub').innerHTML =
+      `${liqPct.toFixed(1)}% = <span>${liqUsd.toFixed(2)}</span> $`;
+
+    // ── Order panel ────────────────────────────────────────────────
+
+    // Объём покупки (токена)
+    // ЛОНГ: ОП = Капитал * СЛ_Убыток(%) / (100% * (ТВХ - Выход_по_СЛ))
+    // ШОРТ: ОП = Капитал * СЛ_Убыток(%) / (100% * (Выход_по_СЛ - ТВХ))
+    let tokenVol = 0;
+    if (direction === 'long' && (entry - slPrice) !== 0) {
+      tokenVol = (capital * slPct) / (100 * (entry - slPrice));
+    } else if (direction === 'short' && (slPrice - entry) !== 0) {
+      tokenVol = (capital * slPct) / (100 * (slPrice - entry));
+    }
+    set('token-vol', tokenVol, 8);
+
+    // Выход по ТП
+    // ЛОНГ: ТП = Вход + ((Вход - Выход_по_СЛ) * СЛкТП)
+    // ШОРТ: ТП = Вход - ((Выход_по_СЛ - Вход) * СЛкТП)
+    let tpPrice = 0;
+    if (direction === 'long') {
+      tpPrice = entry + (entry - slPrice) * tpMult;
+    } else {
+      tpPrice = entry - (slPrice - entry) * tpMult;
+    }
+    set('tp-price', tpPrice);
+
+    // Кредитное плечо: КП = 100 / (СЛ_Убыток(%) * Ликвидация_крат)
+    const leverage = (slPct > 0 && liqMult > 0) ? 100 / (slPct * liqMult) : 0;
+    const leverageEl = document.getElementById('leverage-val');
+    if (leverageEl) leverageEl.value = isFinite(leverage) && leverage > 0 ? leverage.toFixed(1) : '0';
+
+    // Комиссия = Объём токена × ТВХ × Комиссия% / 100
+    const commissionUsd = tokenVol * entry * commPct / 100;
+    set('commission-val', commissionUsd, 4);
+
+    // Цена ликвидации — через плечо (реальная биржевая формула)
+    // ЛОНГ: ЛИК = ТВХ × (1 - 1/КП)
+    // ШОРТ: ЛИК = ТВХ × (1 + 1/КП)
+    let liqPrice = 0;
+    if (leverage > 0) {
+      if (direction === 'long') {
+        liqPrice = entry * (1 - 1 / leverage);
+      } else {
+        liqPrice = entry * (1 + 1 / leverage);
+      }
+    }
+    set('liq-price', liqPrice);
+  }
+
+  // Attach listeners to all inputs
+  document.querySelectorAll('input').forEach(el => {
+    el.addEventListener('input', calculate);
+  });
+
+  calculate();
+</script>
+</body>
+</html>
