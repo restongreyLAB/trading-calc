@@ -314,6 +314,7 @@
     margin: 0 16px;
   }
 
+
   /* ===== SL badge ===== */
   .sl-badge {
     font-family: var(--mono);
@@ -348,7 +349,7 @@
           <span class="row-label">Капитал</span>
         </div>
         <div class="row-right">
-          <input type="number" id="capital" class="yellow" value="500" step="1" min="0" />
+          <input type="number" id="capital" class="yellow" value="100" step="1" min="0" />
           <span class="unit">$</span>
         </div>
       </div>
@@ -357,7 +358,7 @@
       <div class="row">
         <div class="row-num">2</div>
         <div class="row-label-wrap">
-          <span class="row-label">СЛ / убыток</span>
+          <span class="row-label">Риск %</span>
           <span class="row-sub" id="sl-sub">2% = <span id="sl-usd">5.00</span> $</span>
         </div>
         <div class="row-right">
@@ -370,7 +371,7 @@
       <div class="row">
         <div class="row-num">3</div>
         <div class="row-label-wrap">
-          <span class="row-label">ТП / прибыль 1к2</span>
+          <span class="row-label">СЛ к ТП</span>
           <span class="row-sub" id="tp-sub">3% = <span id="tp-usd">15.00</span> $</span>
         </div>
         <div class="row-right">
@@ -379,28 +380,39 @@
         </div>
       </div>
 
-      <!-- 4. Liquidation -->
+      <!-- 4. Maker commission -->
       <div class="row">
         <div class="row-num">4</div>
-        <div class="row-label-wrap">
-          <span class="row-label">Ликвидация = СЛ×</span>
-          <span class="row-sub" id="liq-sub">5% = <span id="liq-usd">10000.00</span> $</span>
-        </div>
-        <div class="row-right">
-          <input type="number" id="liq-mult" class="yellow" value="5" step="0.1" min="0" />
-          <span class="unit">крат</span>
-        </div>
-      </div>
-
-      <!-- 5. Maker commission -->
-      <div class="row">
-        <div class="row-num">5</div>
         <div class="row-label-wrap">
           <span class="row-label">Комиссия Мейкер</span>
         </div>
         <div class="row-right">
-          <input type="number" id="commission" class="yellow" value="0.02" step="0.001" min="0" max="100" />
+          <input type="number" id="commission" class="yellow" value="0.08" step="0.001" min="0" max="100" />
           <span class="unit pct">%</span>
+        </div>
+      </div>
+
+      <!-- 5. Entry price -->
+      <div class="row">
+        <div class="row-num">5</div>
+        <div class="row-label-wrap">
+          <span class="row-label">ТВХ (цена входа)</span>
+        </div>
+        <div class="row-right">
+          <input type="number" id="entry" class="yellow" value="0" step="0.01" min="0" />
+          <span class="unit">$</span>
+        </div>
+      </div>
+
+      <!-- 6. SL price -->
+      <div class="row" id="row-sl-price">
+        <div class="row-num">6</div>
+        <div class="row-label-wrap">
+          <span class="row-label sl" id="sl-price-label">Выход по СЛ</span>
+        </div>
+        <div class="row-right">
+          <input type="number" id="sl-price" class="yellow" value="0" step="0.01" min="0" />
+          <span class="unit">$</span>
         </div>
       </div>
 
@@ -409,50 +421,22 @@
 
   <!-- PANEL 2: Order Data -->
   <div class="panel">
-    <div class="panel-header">
-      <div class="panel-dot orange"></div>
-      <span class="panel-title">Данные на открытие ордера</span>
-    </div>
-
-    <!-- Auto direction indicator -->
-    <div style="padding: 10px 16px 8px;">
-      <div id="dir-btn" class="btn-dir btn-long active" style="width:100%;">
-        <span id="dir-arrow" class="arrow">▲</span>
-        <span id="dir-label">ЛОНГ</span>
+    <div class="panel-header" style="justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="panel-dot orange"></div>
+        <span class="panel-title">Данные на открытие ордера</span>
+      </div>
+      <div id="dir-btn" style="display:inline-flex;align-items:center;gap:5px;">
+        <span id="dir-arrow" style="font-size:9px;color:var(--accent-green);">▲</span>
+        <span id="dir-label" style="font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:0.14em;color:var(--accent-green);text-shadow:0 0 8px rgba(0,230,118,0.6);">ЛОНГ</span>
       </div>
     </div>
-
-    <div class="divider"></div>
 
     <div class="panel-body">
 
-      <!-- 1. Entry price -->
+      <!-- 1. Token volume -->
       <div class="row">
         <div class="row-num">1</div>
-        <div class="row-label-wrap">
-          <span class="row-label">ТВХ (цена входа)</span>
-        </div>
-        <div class="row-right">
-          <input type="number" id="entry" class="yellow" value="72470.70" step="0.01" min="0" />
-          <span class="unit">$</span>
-        </div>
-      </div>
-
-      <!-- 2. SL exit - MANUAL input -->
-      <div class="row">
-        <div class="row-num">2</div>
-        <div class="row-label-wrap">
-          <span class="row-label sl">Выход по СЛ</span>
-        </div>
-        <div class="row-right">
-          <input type="number" id="sl-price" class="yellow" value="70658.90" step="0.01" min="0" />
-          <span class="unit">$</span>
-        </div>
-      </div>
-
-      <!-- 3. Token volume -->
-      <div class="row">
-        <div class="row-num">3</div>
         <div class="row-label-wrap">
           <span class="row-label">Объём токена</span>
         </div>
@@ -462,9 +446,9 @@
         </div>
       </div>
 
-      <!-- 4. TP exit -->
+      <!-- 2. TP exit -->
       <div class="row">
-        <div class="row-num">4</div>
+        <div class="row-num">2</div>
         <div class="row-label-wrap">
           <span class="row-label">Выход по ТП</span>
         </div>
@@ -474,9 +458,22 @@
         </div>
       </div>
 
-      <!-- 5. Liquidation price -->
+      <!-- 3. Leverage -->
+      <div class="row" id="row-leverage">
+        <div class="row-num">3</div>
+        <div class="row-label-wrap">
+          <span class="row-label">Кредитное плечо</span>
+          <span class="row-sub" id="leverage-mode">авто от СЛ</span>
+        </div>
+        <div class="row-right">
+          <input type="number" id="leverage-val" class="cyan" readonly value="0" step="0.1" min="0" />
+          <span class="unit">крат</span>
+        </div>
+      </div>
+
+      <!-- 4. Liquidation price -->
       <div class="row">
-        <div class="row-num">5</div>
+        <div class="row-num">4</div>
         <div class="row-label-wrap">
           <span class="row-label">Цена ликвидации</span>
         </div>
@@ -486,22 +483,9 @@
         </div>
       </div>
 
-      <!-- 6. Leverage -->
+      <!-- 5. Commission paid -->
       <div class="row">
-        <div class="row-num">6</div>
-        <div class="row-label-wrap">
-          <span class="row-label">Кредитное плечо</span>
-          <span class="row-sub">макс. расчётное</span>
-        </div>
-        <div class="row-right">
-          <input type="text" id="leverage-val" class="cyan" readonly value="0" />
-          <span class="unit">крат</span>
-        </div>
-      </div>
-
-      <!-- 7. Commission paid -->
-      <div class="row">
-        <div class="row-num">7</div>
+        <div class="row-num">5</div>
         <div class="row-label-wrap">
           <span class="row-label">Комиссия к оплате</span>
           <span class="row-sub">при открытии ордера</span>
@@ -525,98 +509,67 @@
 
   function set(id, v, decimals = 2) {
     const el = document.getElementById(id);
-    if (el) el.value = isFinite(v) ? v.toFixed(decimals) : '—';
+    if (el) el.value = isFinite(v) && v !== 0 ? v.toFixed(decimals) : '';
   }
 
   function calculate() {
-    const capital  = val('capital');
-    const slPct    = val('sl-pct');
-    const tpMult   = val('tp-mult');
-    const liqMult  = val('liq-mult');
-    const commPct  = val('commission');
-    const entry    = val('entry');
-    const slPrice  = val('sl-price');
+    const capital = val('capital');
+    const slPct   = val('sl-pct');
+    const tpMult  = val('tp-mult');
+    const liqMult = 5;
+    const commPct = val('commission');
+    const entry   = val('entry');
+    const slPrice = val('sl-price');
 
-    // Авто-определение направления: ТВХ - СЛ > 0 → ЛОНГ, < 0 → ШОРТ
-    const diff = entry - slPrice;
-    const direction = diff >= 0 ? 'long' : 'short';
-
-    const btn   = document.getElementById('dir-btn');
+    // Направление: ТВХ - СЛ > 0 → ЛОНГ, < 0 → ШОРТ
+    const direction = (entry - slPrice) >= 0 ? 'long' : 'short';
     const arrow = document.getElementById('dir-arrow');
     const label = document.getElementById('dir-label');
-
     if (direction === 'long') {
-      btn.className = 'btn-dir btn-long active';
-      arrow.textContent = '▲';
-      label.textContent = 'ЛОНГ';
+      arrow.style.color = 'var(--accent-green)'; arrow.textContent = '▲';
+      label.style.color = 'var(--accent-green)'; label.textContent = 'ЛОНГ';
+      label.style.textShadow = '0 0 8px rgba(0,230,118,0.6)';
     } else {
-      btn.className = 'btn-dir btn-short active';
-      arrow.textContent = '▼';
-      label.textContent = 'ШОРТ';
+      arrow.style.color = 'var(--accent-red)'; arrow.textContent = '▼';
+      label.style.color = 'var(--accent-red)'; label.textContent = 'ШОРТ';
+      label.style.textShadow = '0 0 8px rgba(255,61,87,0.6)';
     }
 
-    // ── Strategy panel ─────────────────────────────────────────────
-    const slUsd  = capital * slPct / 100;
-    const tpPct  = slPct * tpMult;
-    const tpUsd  = capital * tpPct / 100;
-    const liqPct = slPct * liqMult;
-    const liqUsd = capital * liqPct / 100;
-
+    // Strategy panel
+    const slUsd = capital * slPct / 100;
+    const tpPct = slPct * tpMult;
+    const tpUsd = capital * tpPct / 100;
     document.getElementById('sl-sub').innerHTML =
       `${slPct.toFixed(1)}% = <span>${slUsd.toFixed(2)}</span> $`;
     document.getElementById('tp-sub').innerHTML =
       `${tpPct.toFixed(1)}% = <span>${tpUsd.toFixed(2)}</span> $`;
-    document.getElementById('liq-sub').innerHTML =
-      `${liqPct.toFixed(1)}% = <span>${liqUsd.toFixed(2)}</span> $`;
 
-    // ── Order panel ────────────────────────────────────────────────
-
-    // Объём покупки (токена)
-    // ЛОНГ: ОП = Капитал * СЛ_Убыток(%) / (100% * (ТВХ - Выход_по_СЛ))
-    // ШОРТ: ОП = Капитал * СЛ_Убыток(%) / (100% * (Выход_по_СЛ - ТВХ))
-    let tokenVol = 0;
-    if (direction === 'long' && (entry - slPrice) !== 0) {
-      tokenVol = (capital * slPct) / (100 * (entry - slPrice));
-    } else if (direction === 'short' && (slPrice - entry) !== 0) {
-      tokenVol = (capital * slPct) / (100 * (slPrice - entry));
-    }
+    // Объём токена
+    const slDiff = direction === 'long' ? (entry - slPrice) : (slPrice - entry);
+    const tokenVol = slDiff > 0 ? (capital * slPct) / (100 * slDiff) : 0;
     set('token-vol', tokenVol, 8);
 
     // Выход по ТП
-    // ЛОНГ: ТП = Вход + ((Вход - Выход_по_СЛ) * СЛкТП)
-    // ШОРТ: ТП = Вход - ((Выход_по_СЛ - Вход) * СЛкТП)
-    let tpPrice = 0;
-    if (direction === 'long') {
-      tpPrice = entry + (entry - slPrice) * tpMult;
-    } else {
-      tpPrice = entry - (slPrice - entry) * tpMult;
-    }
+    const tpPrice = direction === 'long'
+      ? entry + (entry - slPrice) * tpMult
+      : entry - (slPrice - entry) * tpMult;
     set('tp-price', tpPrice);
 
-    // Кредитное плечо: КП = 100 / (СЛ_Убыток(%) * Ликвидация_крат)
-    const leverage = (slPct > 0 && liqMult > 0) ? 100 / (slPct * liqMult) : 0;
-    const leverageEl = document.getElementById('leverage-val');
-    if (leverageEl) leverageEl.value = isFinite(leverage) && leverage > 0 ? leverage.toFixed(1) : '0';
+    // Кредитное плечо: КП = 100 / (Риск% × Ликвидация_крат)
+    const leverage = (slPct > 0) ? 100 / (slPct * liqMult) : 0;
+    const levEl = document.getElementById('leverage-val');
+    if (levEl) levEl.value = leverage > 0 ? leverage.toFixed(1) : '';
 
-    // Комиссия = Объём токена × ТВХ × Комиссия% / 100
-    const commissionUsd = tokenVol * entry * commPct / 100;
-    set('commission-val', commissionUsd, 4);
-
-    // Цена ликвидации — через плечо (реальная биржевая формула)
-    // ЛОНГ: ЛИК = ТВХ × (1 - 1/КП)
-    // ШОРТ: ЛИК = ТВХ × (1 + 1/КП)
-    let liqPrice = 0;
-    if (leverage > 0) {
-      if (direction === 'long') {
-        liqPrice = entry * (1 - 1 / leverage);
-      } else {
-        liqPrice = entry * (1 + 1 / leverage);
-      }
-    }
+    // Цена ликвидации
+    const liqPrice = leverage > 0
+      ? (direction === 'long' ? entry * (1 - 1/leverage) : entry * (1 + 1/leverage))
+      : 0;
     set('liq-price', liqPrice);
+
+    // Комиссия
+    set('commission-val', tokenVol * entry * commPct / 100, 4);
   }
 
-  // Attach listeners to all inputs
   document.querySelectorAll('input').forEach(el => {
     el.addEventListener('input', calculate);
   });
