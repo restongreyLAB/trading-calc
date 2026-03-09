@@ -555,8 +555,9 @@
       : entry - (slPrice - entry) * tpMult;
     set('tp-price', tpPrice);
 
-    // Кредитное плечо: КП = 100 / (Риск% × Ликвидация_крат)
-    const leverage = (slPct > 0) ? 100 / (slPct * liqMult) : 0;
+    // Кредитное плечо: КП = ТВХ / (|ТВХ - СЛ| × Ликвидация_крат)
+    const priceDiff = Math.abs(entry - slPrice);
+    const leverage = (priceDiff > 0 && entry > 0) ? entry / (priceDiff * liqMult) : 0;
     const levEl = document.getElementById('leverage-val');
     if (levEl) levEl.value = leverage > 0 ? leverage.toFixed(1) : '';
 
