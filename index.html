@@ -549,11 +549,13 @@
     const tokenVol = slDiff > 0 ? (capital * slPct) / (100 * slDiff) : 0;
     set('token-vol', tokenVol, 8);
 
-    // Выход по ТП
+    // Выход по ТП — знаки после запятой как у СЛ, минимум 2
     const tpPrice = direction === 'long'
       ? entry + (entry - slPrice) * tpMult
       : entry - (slPrice - entry) * tpMult;
-    set('tp-price', tpPrice);
+    const slDecimals = (document.getElementById('entry').value.split('.')[1] || '').length;
+    const tpDecimals = Math.max(2, slDecimals);
+    set('tp-price', tpPrice, tpDecimals);
 
     // Кредитное плечо: КП = ТВХ / (|ТВХ - СЛ| × Ликвидация_крат)
     const priceDiff = Math.abs(entry - slPrice);
